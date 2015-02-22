@@ -1,1 +1,42 @@
 /* Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#control {
+  padding: 3px;
+  height: 50px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  color: #393939;
+}
+
+#control button {
+  display: inline-block;
+  height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+#output {
+  background-color: black;
+  color: white;
+  border-top: 1px solid lightgrey;
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: mono;
+  padding: 3px;
+  overflow-y: scroll;
+}
+
+#output a {
+  color: lightblue;
+}
+#output a:hover {
+  color: white;
+}
