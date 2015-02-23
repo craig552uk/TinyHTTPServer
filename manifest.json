@@ -15,5 +15,14 @@
     "background": {
       "scripts": ["background.js","js/tiny_http_server.js"]
     }
+  },
+
+  "sockets": {
+    "tcp": {
+      "connect": ["*:*"]
+    },
+    "tcpServer": {
+      "listen": ["127.0.0.1:*"]
+    }
   }
 }

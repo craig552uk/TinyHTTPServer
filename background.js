@@ -16,9 +16,6 @@ chrome.app.runtime.onLaunched.addListener(function() {
       'height': 500
     }
   });
-
-  // Test TinyHTTPServer constructor
-  console.log(new TinyHTTPServer())
 });
 
 
