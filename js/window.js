@@ -18,16 +18,21 @@
   }
 
   btn_dir.click(function(){
-    console.log("Choose Web Root directory");
+    chrome.fileSystem.chooseEntry({'type': 'openDirectory'}, function(directory){
+      if(directory){
+        http && http.set_webroot(directory);
+        chrome.fileSystem.getDisplayPath(directory, function(display_path){
+          print_msg("Web root directory: <strong>" + display_path + "</strong>")
+        })
+      }
+    })
   })
 
   btn_start.click(function(){
-    console.log("Start HTTP Server");
     http && http.start();
   })
 
   btn_stop.click(function(){
-    console.log("Stop HTTP Server");
     http && http.stop();
   })
 

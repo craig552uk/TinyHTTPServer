@@ -29,6 +29,13 @@
   // Public Methods
 
   /**
+   * Choose a directory for the web root
+   */
+  TinyHTTPServer.prototype.set_webroot = function(dir){
+    console.log(dir);
+  }
+
+  /**
    * Start Web Server
    */
   TinyHTTPServer.prototype.start = function(){

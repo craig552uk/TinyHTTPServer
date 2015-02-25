@@ -24,5 +24,9 @@
     "tcpServer": {
       "listen": ["127.0.0.1:*"]
     }
-  }
+  },
+
+  "permissions": [
+    {"fileSystem": ["directory"]}
+  ]
 }
