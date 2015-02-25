@@ -33,18 +33,19 @@
 
   chrome.runtime.getBackgroundPage(function(background){
 
-    // Test TinyHTTPServer
+    // Create TinyHTTPServer instance and assign messaging handlers
     http = new background.TinyHTTPServer();
     http.terminal.log = function(msg){
-      console.log(msg)
       print_msg(msg);
     }
     http.terminal.error = function(msg){
-      console.error(msg);
       print_msg("ERROR " + msg);
     }
+
+    print_msg("&nbsp;")
+    print_msg("&nbsp;Tiny HTTP Server");
+    print_msg("==================");
+    print_msg("&nbsp;");
   })
-
-
 
 })(window, jQuery)

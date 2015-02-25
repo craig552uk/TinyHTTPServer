@@ -44,7 +44,7 @@
       this.running = false;
       this.socket_id = undefined;
     }else{
-      this.error("No socket open with id " + this.socket_id);
+      console.error("No socket open with id " + this.socket_id);
     }
   }
 
@@ -140,21 +140,34 @@
   request_handler = function(request, terminal){
     var
     request_head  = buffer_to_string(request.data).split("\r\n"),
+    request_verb  = request_head[0].split(' ')[0],
+    request_path  = request_head[0].split(' ')[1],
     response_body = "Hello Shite World!",
+    response_code = "200 OK",
+    response_time = new Date(),
     response_head = [
-      "HTTP/1.1 200 OK",
-      "Date: " + (new Date()).toGMTString(),
+      "HTTP/1.1 " + response_code,
+      "Date: " + response_time.toGMTString(),
       "Accept-Ranges: bytes",
       "Content-Length: " + response_body.length,
       "Content-Type: text/html",
       "",
       response_body
-    ];
+    ],
+    log = [
+      response_time.toLocaleString(),
+      request_verb,
+      request_path,
+      response_code
+    ]
 
-    terminal.log("---")
-    terminal.log(request_head.join("<br>"));
-    terminal.log("---")
-    terminal.log(response_head.join("<br>"));
+    terminal.log(log.join(" "));
+
+    // Full Request & Response headers
+    // terminal.log("---")
+    // terminal.log(request_head.join("<br>"));
+    // terminal.log("---")
+    // terminal.log(response_head.join("<br>"));
 
     return string_to_buffer(response_head.join("\r\n"));
   }
