@@ -6,10 +6,15 @@
 
 (function(window){
 
+  var
+  http_codes = {
+    '200': 'OK',
+    '404': 'Not Found'
+  },
 
   // Class definition
 
-  var TinyHTTPServer = function(options){
+  TinyHTTPServer = function(options){
     this.options = options || {};
     this.port    = this.options.port || 8080;
     this.host    = this.options.host || "127.0.0.1";
@@ -137,40 +142,55 @@
    * Accept an HTTP request
    * Return an HTTP response
    */
-  request_handler = function(request, terminal){
+  request_handler = function(req, terminal){
     var
-    request_head  = buffer_to_string(request.data).split("\r\n"),
-    request_verb  = request_head[0].split(' ')[0],
-    request_path  = request_head[0].split(' ')[1],
-    response_body = "Hello Shite World!",
-    response_code = "200 OK",
-    response_time = new Date(),
-    response_head = [
-      "HTTP/1.1 " + response_code,
-      "Date: " + response_time.toGMTString(),
+    request = {},
+    timestamp = new Date();
+
+    request.headers = buffer_to_string(req.data).split("\r\n"),
+    request.verb    = request.headers[0].split(' ')[0],
+    request.path    = request.headers[0].split(' ')[1];
+
+    // Attempt to load file from web root directory
+    var file = get_file(request.path);
+
+    if(file == undefined){
+      file = {
+        'body': "404 Not Found (" + request.path + ")",
+        'mime': "text/plain",
+        'code': "404 Not Found"
+      }
+    }
+
+    terminal.log([
+      timestamp.toLocaleString(),
+      request.verb,
+      request.path,
+      file.code
+    ].join(" "));
+
+    return string_to_buffer([
+      "HTTP/1.1 " + file.code,
+      "Date: " + timestamp.toGMTString(),
       "Accept-Ranges: bytes",
-      "Content-Length: " + response_body.length,
-      "Content-Type: text/html",
+      "Content-Length: " + file.body.length,
+      "Content-Type: " + file.mime,
       "",
-      response_body
-    ],
-    log = [
-      response_time.toLocaleString(),
-      request_verb,
-      request_path,
-      response_code
-    ]
+      file.body
+    ].join("\r\n"));
+  },
 
-    terminal.log(log.join(" "));
-
-    // Full Request & Response headers
-    // terminal.log("---")
-    // terminal.log(request_head.join("<br>"));
-    // terminal.log("---")
-    // terminal.log(response_head.join("<br>"));
-
-    return string_to_buffer(response_head.join("\r\n"));
-  }
+  /**
+   * Load file contents from directory
+   */
+  get_file = function(path){
+    // return undefined; // Toggle to test 404 response
+    return {
+      'body': "Hello World!",
+      'mime': "text/html",
+      'code': "200 OK"
+    }
+  };
 
 
   // Export Class
