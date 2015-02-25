@@ -20,9 +20,10 @@
   btn_dir.click(function(){
     chrome.fileSystem.chooseEntry({'type': 'openDirectory'}, function(directory){
       if(directory){
-        http && http.set_webroot(directory);
+        // TODO save persistantly
         chrome.fileSystem.getDisplayPath(directory, function(display_path){
-          print_msg("Web root directory: <strong>" + display_path + "</strong>")
+          print_msg("Web root directory: <strong>" + display_path + "</strong>");
+          http && http.set_webroot(directory);
         })
       }
     })
@@ -46,6 +47,8 @@
     http.terminal.error = function(msg){
       print_msg("ERROR " + msg);
     }
+
+    window.http = http; // For inspection
 
     print_msg("&nbsp;")
     print_msg("&nbsp;Tiny HTTP Server");

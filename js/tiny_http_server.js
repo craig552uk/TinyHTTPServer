@@ -32,7 +32,8 @@
    * Choose a directory for the web root
    */
   TinyHTTPServer.prototype.set_webroot = function(dir){
-    console.log(dir);
+    // Set directory as web root
+    this.webroot = dir;
   }
 
   /**
@@ -90,7 +91,7 @@
               if(request.socketId != accept.clientSocketId){ return; }
 
               // Handle request, build response
-              var response = request_handler(request, http.terminal);
+              var response = request_handler(http, request, http.terminal);
 
               // Send response back to client
               chrome.sockets.tcp.send(accept.clientSocketId, response, function(resultCode) {
@@ -149,7 +150,7 @@
    * Accept an HTTP request
    * Return an HTTP response
    */
-  request_handler = function(req, terminal){
+  request_handler = function(http, req, terminal){
     var
     request = {},
     timestamp = new Date();
@@ -159,7 +160,7 @@
     request.path    = request.headers[0].split(' ')[1];
 
     // Attempt to load file from web root directory
-    var file = get_file(request.path);
+    var file = get_file(http, request.path);
 
     if(file == undefined){
       file = {
@@ -190,7 +191,19 @@
   /**
    * Load file contents from directory
    */
-  get_file = function(path){
+  get_file = function(http, path){
+
+    // Attempt to load file from web root directory
+    http.webroot.getFile(path.substr(1) || "index.html", {},
+    function(file){
+      // TODO success
+      console.log(file)
+    },
+    function(error){
+      console.log(error)
+      // TODO Error
+    })
+
     // return undefined; // Toggle to test 404 response
     return {
       'body': "Hello World!",
