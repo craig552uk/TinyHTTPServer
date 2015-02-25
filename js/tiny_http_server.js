@@ -21,15 +21,15 @@
     return this;
   }
 
-
   // Public Methods
 
   /**
    * Start Web Server
    */
   TinyHTTPServer.prototype.start = function(){
-    this.socket_id = open_tcp_socket(this.host, this.port, this.terminal);
+    this.socket_id = open_tcp_socket(this);
     if(this.socket_id){
+      console.log("Opened socket with id " + this.socket_id)
       this.running = true;
     }
   }
@@ -39,8 +39,10 @@
    */
   TinyHTTPServer.prototype.stop = function(){
     if(this.socket_id){
-      close_tcp_socket(this.socket_id, this.terminal);
+      console.log("Stopping socket with id " + this.socket_id)
+      close_tcp_socket(this);
       this.running = false;
+      this.socket_id = undefined;
     }else{
       this.error("No socket open with id " + this.socket_id);
     }
@@ -53,7 +55,7 @@
   /**
    * Create, open and listen on a TCP Socket
    */
-  open_tcp_socket = function(host, port, term){
+  open_tcp_socket = function(http){
     var socket_id;
 
     // Create socket
@@ -61,12 +63,12 @@
       socket_id = socket_info.socketId
 
       // Use socket to listen on name:port
-      chrome.sockets.tcpServer.listen(socket_id, host, port, function(result_code){
+      chrome.sockets.tcpServer.listen(socket_id, http.host, http.port, function(result_code){
         if(result_code < 0){
-          term.error("Could not create TCP socket " + chrome.runtime.lastError.message)
+          terminal.error("Could not create TCP socket " + chrome.runtime.lastError.message)
 
         }else{
-          term.log("Serving on <a href=\"http://" + host + ":" + port + "\" target=\"_blank\">http://" + host + ":" + port + "</a>");
+          http.terminal.log("Serving on <a href=\"http://" + http.host + ":" + http.port + "\" target=\"_blank\">http://" + http.host + ":" + http.port + "</a>");
 
           // Listen on socket for connections
           chrome.sockets.tcpServer.onAccept.addListener(function(accept){
@@ -76,12 +78,12 @@
               if(request.socketId != accept.clientSocketId){ return; }
 
               // Handle request, build response
-              var response = request_handler(request, term);
+              var response = request_handler(request, http.terminal);
 
               // Send response back to client
               chrome.sockets.tcp.send(accept.clientSocketId, response, function(resultCode) {
                   if(resultCode.resultCode < 0){
-                    term.error("Could not send data " + chrome.runtime.lastError.message)
+                    http.terminal.error("Could not send data " + chrome.runtime.lastError.message)
                   }
               });
             });
@@ -90,7 +92,8 @@
             chrome.sockets.tcp.setPaused(accept.clientSocketId, false);
           });
 
-          return socket_id;
+          // Save socket id in HTTP object
+          http.socket_id = socket_id;
         }
       })
     });
@@ -100,9 +103,9 @@
   /**
    * Close TCP socket
    */
-  close_tcp_socket = function(socket_id, term){
-    chrome.sockets.tcp.close(socket_id, function(){
-      term.log("Stopped listening on " + host + ":" + port);
+  close_tcp_socket = function(http){
+    chrome.sockets.tcpServer.close(http.socket_id, function(){
+      http.terminal.log("Stopped listening on " + http.host + ":" + http.port);
     })
   },
 
@@ -134,7 +137,7 @@
    * Accept an HTTP request
    * Return an HTTP response
    */
-  request_handler = function(request, term){
+  request_handler = function(request, terminal){
     var
     request_head  = buffer_to_string(request.data).split("\r\n"),
     response_body = "Hello Shite World!",
@@ -148,10 +151,10 @@
       response_body
     ];
 
-    term.log("---")
-    term.log(request_head.join("<br>"));
-    term.log("---")
-    term.log(response_head.join("<br>"));
+    terminal.log("---")
+    terminal.log(request_head.join("<br>"));
+    terminal.log("---")
+    terminal.log(response_head.join("<br>"));
 
     return string_to_buffer(response_head.join("\r\n"));
   }

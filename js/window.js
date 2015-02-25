@@ -5,21 +5,36 @@
 
 (function(window, $){
 
-  var output = $('#output');
+  var
+  http, // HTTP Server instance
+  output    = $('#output'),
+  btn_dir   = $('#directory'),
+  btn_start = $('#start'),
+  btn_stop  = $('#stop');
 
   var print_msg = function(message){
     output.append('<p>' + message + '</p>');
-    output.scrollTop(output.height());
+    output[0].scrollTop = output[0].scrollHeight;
   }
 
-  // output.click(function(){
-  //   print_msg("Sample Output at " + new Date());
-  // });
+  btn_dir.click(function(){
+    console.log("Choose Web Root directory");
+  })
+
+  btn_start.click(function(){
+    console.log("Start HTTP Server");
+    http && http.start();
+  })
+
+  btn_stop.click(function(){
+    console.log("Stop HTTP Server");
+    http && http.stop();
+  })
 
   chrome.runtime.getBackgroundPage(function(background){
 
     // Test TinyHTTPServer
-    var http = new background.TinyHTTPServer();
+    http = new background.TinyHTTPServer();
     http.terminal.log = function(msg){
       console.log(msg)
       print_msg(msg);
@@ -28,7 +43,6 @@
       console.error(msg);
       print_msg("ERROR " + msg);
     }
-    http.start();
   })
 
 
