@@ -20,11 +20,11 @@
 
     // Test TinyHTTPServer
     var http = new background.TinyHTTPServer();
-    http.console.log = function(msg){
+    http.terminal.log = function(msg){
       console.log(msg)
       print_msg(msg);
     }
-    http.console.error = function(msg){
+    http.terminal.error = function(msg){
       console.error(msg);
       print_msg("ERROR " + msg);
     }
